@@ -1,0 +1,42 @@
+version: '2'
+
+services:
+  gitlab-dind:
+    container_name: gitlab-dind
+    image: tiredofit/docker-dind
+    environment:
+      - ZABBIX_HOSTNAME=gitlab-dnid
+    volumes:
+      - /var/lib/docker
+    privileged: true
+    restart: always
+    networks:
+      ci:
+        aliases:
+          - gitlab-dind
+
+  gitlab-runner:
+    container_name: gitlab-runner
+    image: tiredofit/gitlab-runner
+    volumes:
+      - ./config:/etc/gitlab-runner
+      - ./data:/home/gitlab-runner
+    environment:
+      - DOCKER_HOST=tcp://gitlab-dind:2375
+
+      - ZABBIX_HOSTNAME=gitlab-dnid
+
+      - CI_SERVER_URL=https://git.example.org/ci
+      - RUNNER_TOKEN=Runner Token
+      - RUNNER_DESCRIPTION=Description
+      - RUNNER_EXECUTOR=docker
+      - EXECUTOR_DOCKER_IMAGE=docker:git
+    restart: always
+    networks:
+      - ci
+
+networks:
+  ci:
+    external:
+      name: gitlab-runner
+
