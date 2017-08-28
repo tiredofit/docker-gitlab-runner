@@ -66,8 +66,6 @@ ENV ZABBIX_HOSTNAME=gitlab-runner
                zabbix-build-dependencies coreutils libssl1.0
        
 
-   ADD /install/zabbix /etc/zabbix/
-
 ## Add other applications for ease of use
    RUN apk update && \
        apk add \
@@ -75,6 +73,7 @@ ENV ZABBIX_HOSTNAME=gitlab-runner
            curl \
            less \
            logrotate \
+           msmtp \
            nano \
            sudo \
            openssh \
@@ -84,16 +83,21 @@ ENV ZABBIX_HOSTNAME=gitlab-runner
        rm -rf /var/cache/apk/* && \
        cp -R /usr/share/zoneinfo/America/Vancouver /etc/localtime && \
        echo 'America/Vancouver' > /etc/timezone && \
-       mkdir -p /assets/cron
+       mkdir -p /assets/cron && \
 
 
-## Add S6 Init System
-   ARG S6_OVERLAY_VERSION=v1.19.1.1 
-   RUN curl -sSL https://github.com/just-containers/s6-overlay/releases/download/${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz | tar xfz - -C /
-   ADD install/s6 /etc/s6/
+### MSMTP
+       rm -f /usr/sbin/sendmail && \
+       ln -s /usr/bin/msmtp /usr/sbin/sendmail && \
+
+### S6 Installation
+       curl -sSL https://github.com/just-containers/s6-overlay/releases/download/${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz | tar xfz - -C /
+   
+### Add Folders
+   ADD /install /
 
 ### Networking Configuration
    EXPOSE 10050/TCP
    
-## Entrypoint Configuration
-   ENTRYPOINT ["/init"]
+### Entrypoint Configuration
+   CMD ["bash"]
