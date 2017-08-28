@@ -92,5 +92,8 @@ ENV ZABBIX_HOSTNAME=gitlab-runner
    RUN curl -sSL https://github.com/just-containers/s6-overlay/releases/download/${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz | tar xfz - -C /
    ADD install/s6 /etc/s6/
 
+### Networking Configuration
+   EXPOSE 10050/TCP
+   
 ## Entrypoint Configuration
    ENTRYPOINT ["/init"]
