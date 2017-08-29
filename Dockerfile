@@ -2,7 +2,11 @@ FROM gitlab/gitlab-runner:alpine
 MAINTAINER Dave Conroy <dave at tiredofit dot ca>
 
 ## Add a couple packages to make life easier
-ENV ZABBIX_HOSTNAME=gitlab-runner
+   ENV ZABBIX_HOSTNAME=gitlab-runner
+   ARG S6_OVERLAY_VERSION=v1.19.1.1 
+   ARG MAJOR_VERSION=3.4
+   ARG ZBX_VERSION=${MAJOR_VERSION}
+
 
 ### Zabbix Pre Installation steps
    RUN addgroup zabbix && \
@@ -21,14 +25,7 @@ ENV ZABBIX_HOSTNAME=gitlab-runner
             coreutils \
             libssl1.0  && \
 
-       rm -rf /var/cache/apk/* && \
-       mkdir -p /assets/cron
-
-  ARG MAJOR_VERSION=3.4
-  ARG ZBX_VERSION=${MAJOR_VERSION}
-
 ### Zabbix Compilation
-   RUN apk update && \
        apk add ${APK_FLAGS_DEV} --virtual zabbix-build-dependencies \
                alpine-sdk \
                automake \
@@ -63,41 +60,52 @@ ENV ZABBIX_HOSTNAME=gitlab-runner
        cd /tmp/ && \
        rm -rf /tmp/zabbix/ && \
        apk del --purge \
-               zabbix-build-dependencies coreutils libssl1.0
-       
+               zabbix-build-dependencies \
+               coreutils \ 
+               libssl1.0 && \
 
-## Add other applications for ease of use
-   RUN apk update && \
+ ### Install MailHog
+       apk --no-cache add --virtual mailhog-build-dependencies \
+                go \
+                git \
+                musl-dev \
+                && \
+       mkdir -p /usr/src/gocode && \
+       export GOPATH=/usr/src/gocode && \
+       go get github.com/mailhog/MailHog && \
+       go get github.com/mailhog/mhsendmail && \
+       mv /usr/src/gocode/bin/MailHog /usr/local/bin && \
+       mv /usr/src/gocode/bin/mhsendmail /usr/local/bin && \
+       rm -rf /usr/src/gocode && \
+       apk del --purge mailhog-build-dependencies && \
+       adduser -D -u 1025 mailhog && \
+
+### Add Core Utils
        apk add \
-           bash \
-           curl \
-           less \
-           logrotate \
-           msmtp \
-           nano \
-           sudo \
-           openssh \
-           tzdata \
-           vim \
-           && \
+            bash \
+            curl \
+            less \
+            logrotate \
+            msmtp \
+            nano \
+            tzdata \
+            vim \
+            && \
        rm -rf /var/cache/apk/* && \
+       rm -rf /etc/logrotate.d/acpid && \
        cp -R /usr/share/zoneinfo/America/Vancouver /etc/localtime && \
        echo 'America/Vancouver' > /etc/timezone && \
-       mkdir -p /assets/cron && \
-
-
-### MSMTP
-       rm -f /usr/sbin/sendmail && \
-       ln -s /usr/bin/msmtp /usr/sbin/sendmail && \
 
 ### S6 Installation
-       curl -sSL https://github.com/just-containers/s6-overlay/releases/download/${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz | tar xfz - -C /
+       curl -sSL https://github.com/just-containers/s6-overlay/releases/download/${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz | tar xfz - -C / && \
    
 ### Add Folders
-   ADD /install /
+       mkdir -p /assets/cron
 
+   ADD /install /
+   
 ### Networking Configuration
-   EXPOSE 10050/TCP
+   EXPOSE 1025 8025 10050/TCP 
    
 ### Entrypoint Configuration
    CMD ["bash"]
