@@ -1,3 +1,7 @@
+## 2.2 2017-09-02 <dave at tiredofitdot ca>
+
+* Zabbix Agent 3.4.1 instead of Trunk
+
 ## 2.1 2017-08-29 <dave at tiredofitdot ca>
 
 * Reduced Layers
