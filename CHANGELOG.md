@@ -1,3 +1,7 @@
+## 2.3 2017-10-17 <dave at tiredofitdot ca>
+
+* Filesystem Cleanup, Overlay FS Fix
+
 ## 2.2 2017-09-02 <dave at tiredofitdot ca>
 
 * Zabbix Agent 3.4.1 instead of Trunk

@@ -65,5 +65,5 @@ if [ ! -f /tmp/state/10-gitlab-runner ]; then
 fi
 
 echo ''
-echo '** Starting Gitlab Runner'
+echo '** [gitlab-runner] Starting Gitlab Runner'
 exec gitlab-ci-multi-runner run --user=gitlab-runner --working-directory=/home/gitlab-runner
