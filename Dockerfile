@@ -3,7 +3,6 @@ LABEL maintainer="Dave Conroy (dave at tiredofit dot ca)"
 
 ### Set Defaults/Arguments
     ARG S6_OVERLAY_VERSION=v1.21.4.0 
-    
     RUN apk update && \
 ### Install MailHog
       apk --no-cache add --virtual mailhog-build-dependencies \
@@ -19,7 +18,7 @@ LABEL maintainer="Dave Conroy (dave at tiredofit dot ca)"
        mv /usr/src/gocode/bin/mhsendmail /usr/local/bin && \
        rm -rf /usr/src/gocode && \
        apk del --purge mailhog-build-dependencies && \
-       adduser -D -u 1025 mailhog && \
+       adduser -S -D -H -h /dev/null -u 1025 mailhog && \
 
 ### Add Core Utils
        apk --no-cache upgrade && \
