@@ -1,0 +1,7 @@
+#!/usr/bin/with-contenv bash
+
+update_ca() {
+    print_notice "Updating CA certificates"
+    cp "${CA_CERTIFICATES_PATH}" "${LOCAL_CA_PATH}"
+    silent update-ca-certificates --fresh
+}

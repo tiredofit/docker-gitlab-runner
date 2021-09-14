@@ -1,11 +1,11 @@
-version: '2'
+version: '2.4'
 
 services:
   gitlab-dind:
     container_name: gitlab-dind
     image: tiredofit/docker-dind
     environment:
-      - ZABBIX_HOSTNAME=gitlab-dnid
+      - CONTAINER_NAME=gitlab-dnid
     volumes:
       - /var/lib/docker
     privileged: true
@@ -23,8 +23,9 @@ services:
       - ./data:/home/gitlab-runner
     environment:
       - DOCKER_HOST=tcp://gitlab-dind:2375
+      - CONTAINER_LOG_LEVEL=DEBUG
 
-      - ZABBIX_HOSTNAME=gitlab-dnid
+      - CONTAINER_NAME=gitlab-dnid
 
       - CI_SERVER_URL=https://git.example.org/ci
       - RUNNER_TOKEN=Runner Token

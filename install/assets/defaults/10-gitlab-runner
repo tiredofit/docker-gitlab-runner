@@ -1,0 +1,8 @@
+#!/usr/bin/with-contenv bash
+
+CONFIG_FILE=${CONFIG_FILE:-"config.toml"}
+CONFIG_PATH=${CONFIG_PATH:-"/etc/gitlab-runner"}
+EXECUTOR_DOCKER_IMAGE=${EXECUTOR_DOCKER_IMAGE:-"docker-git"}
+HOME_PATH=${HOME_PATH:-"/home/gitlab-runner"}
+CA_CERTIFICATES_PATH=${CA_CERTIFICATES_PATH:-"$CONFIG_PATH/certs/ca.crt"}
+LOCAL_CA_PATH=${LOCAL_CA_PATH:-"/usr/local/share/ca-certificates/ca.crt"}

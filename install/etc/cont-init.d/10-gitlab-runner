@@ -1,0 +1,68 @@
+#!/usr/bin/with-contenv bash
+
+source /assets/functions/00-container
+PROCESS_NAME="gitlab-runner"
+prepare_service
+
+if [ -f "${CA_CERTIFICATES_PATH}" ]; then
+    # update the ca if the custom ca is different than the current
+    cmp -s "${CA_CERTIFICATES_PATH}" "${LOCAL_CA_PATH}" || update_ca
+fi
+
+## Generate SSH Deploy Keys
+mkdir -p "${HOME_PATH}"
+chown -R gitlab-runner:root "${HOME_PATH}"
+chmod -R 700 "${HOME_PATH}"
+sudo -HEu gitlab-runner mkdir -p "${HOME_PATH}"/.ssh/
+
+if [[ ! -e ${HOME_PATH}/.ssh/id_rsa || ! -e ${HOME_PATH}/.ssh/id_rsa.pub ]]; then
+    print_notice "Generating SSH deploy keys"
+    rm -rf "${HOME_PATH}"/.ssh/id_rsa "${HOME_PATH}"/.ssh/id_rsa.pub
+    sudo -HEu gitlab-runner ssh-keygen -t rsa -N "" -f "${HOME_PATH}"/.ssh/id_rsa
+    echo ""
+    print_notice "Your SSH deploy key is: "
+    cat "${HOME_PATH}"/.ssh/id_rsa.pub
+    echo ""
+fi
+
+chmod 600 "${HOME_PATH}"/.ssh/id_rsa "${HOME_PATH}"/.ssh/id_rsa.pub
+chmod 700 "${HOME_PATH}"/.ssh
+chown -R gitlab-runner:root "${HOME_PATH}"/.ssh/
+
+## Configure Runner
+chown -R gitlab-runner:root "${CONFIG_PATH}"
+if [[ ! -f "${CONFIG_PATH}"/"${CONFIG_FILE}" ]]; then
+    print_notice "Configuration file not found - Generating.."
+    if [[ -n "${CI_SERVER_URL}" && -n "${RUNNER_TOKEN}" && -n "${RUNNER_DESCRIPTION}" && -n "${RUNNER_EXECUTOR}" ]]; then
+        if [ "${RUNNER_EXECUTOR}" = "docker" ];  then
+            silent sudo -HEu gitlab-runner gitlab-runner register \
+                                    --config "${CONFIG_PATH}"/"${CONFIG_FILE}" \
+                                    --docker-image "${EXECUTOR_DOCKER_IMAGE}" \
+                                    --docker-volumes /var/run/docker.sock:/var/run/docker.sock \
+                                    --executor "${RUNNER_EXECUTOR}" \
+                                    --name "${RUNNER_DESCRIPTION}" \
+                                    --non-interactive \
+                                    --url "${CI_SERVER_URL}" \
+                                    --registration-token "${RUNNER_TOKEN}"
+            if [ "$?" -ne "0" ]; then
+                print_error "Gitlab Runner Registration failed! - Try running with 'CONTAINER_LOG_LEVEL=DEBUG' for details"
+                exit 1
+            fi
+fi
+        else
+            silent sudo -HEu gitlab-runner gitlab-runner register \
+                                    --executor "${RUNNER_EXECUTOR}" \
+                                    --name "${RUNNER_DESCRIPTION}" \
+                                    --non-interactive \
+                                    --url "${CI_SERVER_URL}"
+            if [ "$?" -ne "0" ]; then
+                print_error "Gitlab Runner Registration failed! - Try running with 'CONTAINER_LOG_LEVEL=DEBUG' for details"
+                exit 1
+            fi
+        fi
+    fi
+else
+    print_error "Please provide a proper ${CONFIG_PATH}/${CONFIG_FILE}"
+fi
+
+liftoff

@@ -1,0 +1,15 @@
+#!/usr/bin/with-contenv bash
+
+source /assets/functions/00-container
+prepare_service
+PROCESS_NAME="gitlab-runner"
+
+check_container_initialized
+check_service_initialized init
+liftoff
+
+print_start "Starting Gitlab Runner $(gitlab-runner -v | head -n1 | awk '{print $2}')"
+exec gitlab-ci-multi-runner run \
+                            --config "${CONFIG_PATH}"/"${CONFIG_FILE}" \
+                            --user=gitlab-runner \
+                            --working-directory="${HOME_PATH}"

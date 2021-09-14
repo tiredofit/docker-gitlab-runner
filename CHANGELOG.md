@@ -1,3 +1,9 @@
+## 4.0.0 2021-09-14 <dave at tiredofit dot ca>
+
+   ### Added
+      - New Rewrite, pulling tiredofit/alpine monthly to get latest version of gitlab-runner:latest
+
+
 ## 3.0 2018-03-26 <dave at tiredofit dot ca>
 
 * Based on Alpine 3.7 - Stop compiling Zabbix
