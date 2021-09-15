@@ -59,9 +59,9 @@ if [[ ! -f "${CONFIG_PATH}"/"${CONFIG_FILE}" ]]; then
                 exit 1
             fi
         fi
+    else
+        print_error "Please provide a proper ${CONFIG_PATH}/${CONFIG_FILE}"
     fi
-else
-    print_error "Please provide a proper ${CONFIG_PATH}/${CONFIG_FILE}"
 fi
 
 liftoff
