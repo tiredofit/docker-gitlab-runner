@@ -1,3 +1,9 @@
+## 4.0.1 2021-09-14 <dave at tiredofit dot ca>
+
+   ### Changed
+      - Fix for 4.0.0 script
+
+
 ## 4.0.0 2021-09-14 <dave at tiredofit dot ca>
 
    ### Added

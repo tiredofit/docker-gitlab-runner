@@ -48,7 +48,6 @@ if [[ ! -f "${CONFIG_PATH}"/"${CONFIG_FILE}" ]]; then
                 print_error "Gitlab Runner Registration failed! - Try running with 'CONTAINER_LOG_LEVEL=DEBUG' for details"
                 exit 1
             fi
-fi
         else
             silent sudo -HEu gitlab-runner gitlab-runner register \
                                     --executor "${RUNNER_EXECUTOR}" \
