@@ -1,3 +1,9 @@
+## 4.0.3 2021-12-15 <dave at tiredofit dot ca>
+
+   ### Added
+      - Add Zabbix Auto register support
+
+
 ## 4.0.2 2021-09-15 <dave at tiredofit dot ca>
 
    ### Changed
