@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bash
+#!/command/with-contenv bash
 
 CONFIG_FILE=${CONFIG_FILE:-"config.toml"}
 CONFIG_PATH=${CONFIG_PATH:-"/etc/gitlab-runner"}

@@ -1,3 +1,9 @@
+## 4.0.4 2022-03-31 <dave at tiredofit dot ca>
+
+   ### Added
+      - Refactor Image
+
+
 ## 4.0.3 2021-12-15 <dave at tiredofit dot ca>
 
    ### Added

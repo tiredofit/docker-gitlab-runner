@@ -1,17 +1,11 @@
-#!/usr/bin/with-contenv bash
+#!/command/with-contenv bash
 
 source /assets/functions/00-container
 PROCESS_NAME="gitlab-runner"
 prepare_service
 prepare_service 03-monitoring
 
-if var_true "${CONTAINER_ENABLE_MONITORING}" && [ "${CONTAINER_MONITORING_BACKEND,,}" = "zabbix" ]; then
-	cat <<EOF > "${ZABBIX_CONFIG_PATH}"/"${ZABBIX_CONFIG_FILE}.d"/tiredofit_gitlab-runner.conf
-# Zabbix Gitlab Runner Configuration - Automatically Generated
-# Find Companion Zabbix Server Templates at https://github.com/tiredofit/docker-gitlab-runner
-# Autoregister=gitlab-runner
-EOF
-fi
+create_zabbix gitlab-runner
 
 if [ -f "${CA_CERTIFICATES_PATH}" ]; then
     # update the ca if the custom ca is different than the current

@@ -86,7 +86,11 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/tiredofit/docker-alpine docker-alpine
           sed -i "s|FROM .*|FROM gitlab/gitlab-runner:alpine|g" ./docker-alpine/Dockerfile
+          sed -i 's|IMAGE_NAME="tiredofit/alpine"|IMAGE_NAME="tiredofit/gitlab-runner"|g' ./docker-alpine/Dockerfile
+          sed -i 's|IMAGE_REPO_URL="https://github.com/tiredofit/docker-alpine/"|IMAGE_REPO_URL="https://github.com/tiredofit/docker-gitlab-runner/"|g' ./docker-alpine/Dockerfile
           cp -R install docker-alpine/
+          mkdir -p docker-alpine/install/assets/.changelogs
+          cp -R docker-alpine/CHANGELOG.md docker-alpine/install/assets/.changelogs/tiredofit_docker-alpine.md
 
       - name: Label
         id: Label
@@ -97,7 +101,8 @@ jobs:
             sed -i "/FROM .*/a LABEL tiredofit.image.git_committed_by=\"${GITHUB_ACTOR}\"" ./docker-alpine/Dockerfile
             sed -i "/FROM .*/a LABEL tiredofit.image.image_build_date=\"$(date +'%Y-%m-%d %H:%M:%S')\"" ./docker-alpine/Dockerfile
             if [ -f "CHANGELOG.md" ] ; then
-              sed -i "/FROM .*/a LABEL tiredofit.image.git_changelog_version=\"$(head -n1 ./CHANGELOG.md | awk '{print $2}')\"" ./docker-alpine/Dockerfile
+              sed -i "/FROM .*/a LABEL tiredofit.gitlab-runner.git_changelog_version=\"$(head -n1 ./CHANGELOG.md | awk '{print $2}')\"" docker-alpine/Dockerfile
+              mkdir -p docker-alpine/install/assets/.changelogs ; cp CHANGELOG.md docker-alpine/install/assets/.changelogs/${GITHUB_REPOSITORY/\//_}.md
             fi
 
             if [[ $GITHUB_REF == refs/tags/* ]]; then
@@ -115,7 +120,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./docker-alpine/
           file: ./docker-alpine/Dockerfile
-          #platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
+          #platforms: linux/amd64,linux/arm/v7,linux/arm64
           platforms: linux/amd64
           push: true
           tags: ${{ steps.prep.outputs.tags }}
