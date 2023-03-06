@@ -18,7 +18,7 @@ chown -R gitlab-runner:root "${HOME_PATH}"
 chmod -R 700 "${HOME_PATH}"
 sudo -HEu gitlab-runner mkdir -p "${HOME_PATH}"/.ssh/
 
-if [[ ! -e ${HOME_PATH}/.ssh/id_rsa || ! -e ${HOME_PATH}/.ssh/id_rsa.pub ]]; then
+if [[ ! -e "${HOME_PATH}"/.ssh/id_rsa || ! -e "${HOME_PATH}"/.ssh/id_rsa.pub ]]; then
     print_notice "Generating SSH deploy keys"
     rm -rf "${HOME_PATH}"/.ssh/id_rsa "${HOME_PATH}"/.ssh/id_rsa.pub
     sudo -HEu gitlab-runner ssh-keygen -t rsa -N "" -f "${HOME_PATH}"/.ssh/id_rsa
@@ -65,6 +65,18 @@ if [[ ! -f "${CONFIG_PATH}"/"${CONFIG_FILE}" ]]; then
     else
         print_error "Please provide a proper ${CONFIG_PATH}/${CONFIG_FILE}"
         exit 1
+    fi
+else
+    if [[ -n "${CI_SERVER_URL}" && -n "${RUNNER_TOKEN}" && -n "${RUNNER_DESCRIPTION}" && -n "${RUNNER_EXECUTOR}" ]]; then
+        if [ "${RUNNER_EXECUTOR}" = "docker" ];  then
+            sed -i \
+                        -e "s|  name = .*|  name = \"${RUNNER_DESCRIPTION}\"|g" \
+                        -e "s|  url = .*|  url = \"${CI_SERVER_URL}\"|g" \
+                        -e "s|  token = .*|  token = \"${RUNNER_TOKEN}\"|g" \
+                        -e "s|  host = .*|  host = \"${DOCKER_HOST}\"|g" \
+                        -e "s|  image = .*|  image = \"${RUNNER_EXECUTOR}\"|g" \
+                        "${CONFIG_PATH}"/"${CONFIG_FILE}"
+        fi
     fi
 fi
 

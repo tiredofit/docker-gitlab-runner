@@ -1,3 +1,9 @@
+## 4.1.0 2023-03-06 <dave at tiredofit dot ca>
+
+   ### Added
+      - Update running configuration with environment variables
+
+
 ## 4.0.4 2022-03-31 <dave at tiredofit dot ca>
 
    ### Added
