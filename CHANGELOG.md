@@ -1,3 +1,9 @@
+## 4.1.1 2023-03-06 <dave at tiredofit dot ca>
+
+   ### Changed
+      - Fix for inputting proper docker image
+
+
 ## 4.1.0 2023-03-06 <dave at tiredofit dot ca>
 
    ### Added

@@ -74,7 +74,7 @@ else
                         -e "s|  url = .*|  url = \"${CI_SERVER_URL}\"|g" \
                         -e "s|  token = .*|  token = \"${RUNNER_TOKEN}\"|g" \
                         -e "s|  host = .*|  host = \"${DOCKER_HOST}\"|g" \
-                        -e "s|  image = .*|  image = \"${RUNNER_EXECUTOR}\"|g" \
+                        -e "s|  image = .*|  image = \"${EXECUTOR_DOCKER_IMAGE}\"|g" \
                         "${CONFIG_PATH}"/"${CONFIG_FILE}"
         fi
     fi
